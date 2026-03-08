@@ -6,10 +6,13 @@ export const colors = {
   border: '#E5E7EB',
   primary: '#1F2937',
   primarySoft: '#EEF2FF',
+  primaryTint: '#CBD5F5',
   danger: '#D94848',
   dangerSoft: '#FEE2E2',
   success: '#16A34A',
   successSoft: '#DCFCE7',
+  accent: '#0F172A',
+  gold: '#D9A441',
 };
 
 export const spacing = {
@@ -32,4 +35,16 @@ export const shadow = {
   shadowOpacity: 0.08,
   shadowRadius: 16,
   elevation: 3,
+};
+
+export const fonts = {
+  heading: 'SpaceGrotesk_700Bold',
+  subheading: 'SpaceGrotesk_600SemiBold',
+  body: 'SpaceGrotesk_400Regular',
+  bodyMedium: 'SpaceGrotesk_500Medium',
+};
+
+export const gradients = {
+  screen: ['#F9FAFB', '#EEF2FF'],
+  hero: ['#111827', '#1F2937'],
 };

@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useMemo, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useMemo, useRef, useState } from 'react';
 import { PhotoItem, SessionHistoryEntry } from '../../types/models';
 
 export type SessionState = {
@@ -8,6 +8,7 @@ export type SessionState = {
   deletedIds: string[];
   history: SessionHistoryEntry[];
   startedAt: number | null;
+  isActionLocked: boolean;
 };
 
 export type SessionContextValue = SessionState & {
@@ -26,14 +27,29 @@ const initialState: SessionState = {
   deletedIds: [],
   history: [],
   startedAt: null,
+  isActionLocked: false,
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<SessionState>(initialState);
+  const actionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const actionCooldownMs = 200;
+
+  const lockActions = () => {
+    if (actionTimeoutRef.current) {
+      clearTimeout(actionTimeoutRef.current);
+    }
+    actionTimeoutRef.current = setTimeout(() => {
+      setState((prev) => ({ ...prev, isActionLocked: false }));
+    }, actionCooldownMs);
+  };
 
   const startSession = (photos: PhotoItem[]) => {
+    if (actionTimeoutRef.current) {
+      clearTimeout(actionTimeoutRef.current);
+    }
     setState({
       photos,
       currentIndex: 0,
@@ -41,14 +57,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       deletedIds: [],
       history: [],
       startedAt: Date.now(),
+      isActionLocked: false,
     });
   };
 
   const markKeep = () => {
+    if (state.isActionLocked || state.currentIndex >= state.photos.length) {
+      return;
+    }
     setState((prev) => {
-      if (prev.currentIndex >= prev.photos.length) {
-        return prev;
-      }
       const current = prev.photos[prev.currentIndex];
       const keptIds = new Set(prev.keptIds);
       keptIds.add(current.id);
@@ -59,15 +76,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         keptIds: Array.from(keptIds),
         deletedIds: prev.deletedIds.filter((id) => id !== current.id),
         history: [...prev.history, { id: current.id, action: 'keep' }],
+        isActionLocked: true,
       };
     });
+    lockActions();
   };
 
   const markDelete = () => {
+    if (state.isActionLocked || state.currentIndex >= state.photos.length) {
+      return;
+    }
     setState((prev) => {
-      if (prev.currentIndex >= prev.photos.length) {
-        return prev;
-      }
       const current = prev.photos[prev.currentIndex];
       const deletedIds = new Set(prev.deletedIds);
       deletedIds.add(current.id);
@@ -78,15 +97,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         deletedIds: Array.from(deletedIds),
         keptIds: prev.keptIds.filter((id) => id !== current.id),
         history: [...prev.history, { id: current.id, action: 'delete' }],
+        isActionLocked: true,
       };
     });
+    lockActions();
   };
 
   const undo = () => {
+    if (state.isActionLocked || state.history.length === 0 || state.currentIndex === 0) {
+      return;
+    }
     setState((prev) => {
-      if (prev.history.length === 0 || prev.currentIndex === 0) {
-        return prev;
-      }
       const last = prev.history[prev.history.length - 1];
       const nextIndex = Math.max(prev.currentIndex - 1, 0);
       return {
@@ -101,8 +122,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
             ? prev.deletedIds.filter((id) => id !== last.id)
             : prev.deletedIds,
         history: prev.history.slice(0, -1),
+        isActionLocked: true,
       };
     });
+    lockActions();
   };
 
   const unmarkDelete = (id: string) => {
@@ -119,6 +142,9 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   };
 
   const resetSession = () => {
+    if (actionTimeoutRef.current) {
+      clearTimeout(actionTimeoutRef.current);
+    }
     setState(initialState);
   };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
-import { colors, radii, spacing } from '../constants/theme';
+import { colors, fonts, radii, spacing } from '../constants/theme';
 
 type Variant = 'primary' | 'secondary' | 'danger';
 
@@ -46,5 +46,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: fonts.bodyMedium,
   },
 });

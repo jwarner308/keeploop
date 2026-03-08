@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
-import { colors, radii, shadow, spacing } from '../constants/theme';
+import { colors, fonts, radii, shadow, spacing } from '../constants/theme';
 
 type Props = {
   source: ImageSourcePropType;
@@ -26,6 +26,8 @@ const styles = StyleSheet.create({
     borderRadius: radii.lg,
     overflow: 'hidden',
     backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     ...shadow,
   },
   image: {
@@ -45,5 +47,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: fonts.subheading,
   },
 });
