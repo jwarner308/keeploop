@@ -1,0 +1,35 @@
+export const colors = {
+  background: '#F6F7F9',
+  surface: '#FFFFFF',
+  text: '#111827',
+  muted: '#6B7280',
+  border: '#E5E7EB',
+  primary: '#1F2937',
+  primarySoft: '#EEF2FF',
+  danger: '#D94848',
+  dangerSoft: '#FEE2E2',
+  success: '#16A34A',
+  successSoft: '#DCFCE7',
+};
+
+export const spacing = {
+  xs: 6,
+  sm: 10,
+  md: 16,
+  lg: 24,
+  xl: 32,
+};
+
+export const radii = {
+  sm: 10,
+  md: 16,
+  lg: 24,
+};
+
+export const shadow = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 8 },
+  shadowOpacity: 0.08,
+  shadowRadius: 16,
+  elevation: 3,
+};
